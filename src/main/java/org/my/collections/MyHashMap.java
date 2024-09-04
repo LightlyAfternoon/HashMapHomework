@@ -41,9 +41,27 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     }
 
     public V delete(Object key) {
-        size--;
+        Node<K, V> node = getNode(key);
 
-        return ;
+        if (node != null) {
+            Node<K, V> parentNode = getParentNode(node);
+
+            if (parentNode != null && node.next != null) {
+                parentNode.next = node.next;
+            } else if (parentNode != null){
+                parentNode.next = null;
+            } else {
+                int index = indexFor(node.key.hashCode(), table.length);
+
+                table[index] = null;
+            }
+
+            size--;
+
+            return node.value;
+        }
+
+        return null;
     }
 
     @Override
@@ -59,16 +77,6 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     @Override
     public Set<Entry<K, V>> entrySet() {
         return ;
-    }
-
-    private int hash(Object key) {
-        if (key == null) {
-            return 0;
-        }
-        int code = key.hashCode();
-        code ^= (code >>> 20) ^ (code >>> 12);
-
-        return code ^ (code >>> 7) ^ (code >>> 4);
     }
 
     private Node<K, V> getNode(Object key) {
@@ -92,6 +100,39 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         }
 
         return null;
+    }
+
+    private Node<K, V> getParentNode(Node<K, V> node) {
+        for (int i = 0; i < size; i++) {
+            if (table[i].next == node) {
+                return table[i];
+            } else if (table[i].next != null) {
+                Node<K, V> thisNode = table[i];
+
+                while (thisNode.next != null) {
+                    if (thisNode.next == node) {
+                        return thisNode;
+                    }
+                    thisNode = thisNode.next;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private int hash(Object key) {
+        if (key == null) {
+            return 0;
+        }
+        int hash = key.hashCode();
+        hash ^= (hash >>> 20) ^ (hash >>> 12);
+
+        return hash ^ (hash >>> 7) ^ (hash >>> 4);
+    }
+
+    private int indexFor(int hash, int tableLength) {
+        return hash & (tableLength - 1);
     }
 
     private static class Node<K, V> implements Map.Entry<K, V> {
