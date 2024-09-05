@@ -1,9 +1,7 @@
 package org.my.collections;
 
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private final static int DEFAULT_TABLE_CAPACITY = 16;
@@ -12,10 +10,12 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private Node<K, V>[] table;
     private int size = 0;
     private int limit;
+    private float loadFactor;
 
     MyHashMap() {
         table = new Node[DEFAULT_TABLE_CAPACITY];
-        limit = (int) (DEFAULT_TABLE_CAPACITY * DEFAULT_LOAD_FACTOR);
+        loadFactor = DEFAULT_LOAD_FACTOR;
+        limit = (int) (DEFAULT_TABLE_CAPACITY * loadFactor);
     }
 
     @Override
@@ -35,9 +35,66 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V put(K key, V value) {
-        size++;
+        Node<K, V> existedNode = getNode(key);
 
-        return ;
+        if (existedNode != null) {
+            V oldValue = existedNode.value;
+            existedNode.value = value;
+
+            return oldValue;
+        } else if (key == null) {
+            Node<K, V> node = new Node<K, V>(0, null, value, null);
+
+            putNode(0, node, table);
+        } else {
+            int keyHash = hash(key);
+            int index = indexFor(keyHash, table.length);
+            Node<K, V> node = new Node<>(keyHash, key, value, null);
+
+            putNode(index, node, table);
+        }
+
+        if (++size > limit) {
+            resize();
+        }
+
+        return null;
+    }
+
+    private void resize() {
+        int newLength = size << 1;
+        Node<K, V>[] newTable = new Node[newLength];
+
+        newTable[0] = table[0];
+        for (int i = 1; i < size; i++) {
+            Node<K, V> node = table[i];
+            int newHash = hash(node.key);
+            int newIndex = indexFor(newHash, newLength);
+            newTable[newIndex] = node;
+
+            while (node.next != null) {
+                node = node.next;
+                newHash = hash(node.key);
+                newIndex = indexFor(newHash, newLength);
+
+                putNode(newIndex, node, newTable);
+            }
+        }
+
+        limit = (int) (newLength * loadFactor);
+    }
+
+    private void putNode(int index, Node<K, V> node, Node<K, V>[] table) {
+        if (table[index] == null) {
+            table[index] = node;
+        } else {
+            Node<K, V> thisNode = table[index];
+
+            while (thisNode.next != null) {
+                thisNode = thisNode.next;
+            }
+            thisNode.next = node;
+        }
     }
 
     public V delete(Object key) {
@@ -66,17 +123,17 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public Collection<V> values() {
-        return ;
+        return Arrays.stream(table).map(t -> t.value).collect(Collectors.toList());
     }
 
     @Override
     public Set<K> keySet() {
-        return ;
+        return Arrays.stream(table).map(t -> t.key).collect(Collectors.toSet());
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return ;
+        return Arrays.stream(table).collect(Collectors.toSet());
     }
 
     private Node<K, V> getNode(Object key) {
