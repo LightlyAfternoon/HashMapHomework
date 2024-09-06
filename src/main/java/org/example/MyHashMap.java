@@ -1,4 +1,4 @@
-package org.my.collections;
+package org.example;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,7 +12,7 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private int limit;
     private float loadFactor;
 
-    MyHashMap() {
+    public MyHashMap() {
         table = new Node[DEFAULT_TABLE_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTOR;
         limit = (int) (DEFAULT_TABLE_CAPACITY * loadFactor);
@@ -61,42 +61,6 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
-    private void resize() {
-        int newLength = size << 1;
-        Node<K, V>[] newTable = new Node[newLength];
-
-        newTable[0] = table[0];
-        for (int i = 1; i < size; i++) {
-            Node<K, V> node = table[i];
-            int newHash = hash(node.key);
-            int newIndex = indexFor(newHash, newLength);
-            newTable[newIndex] = node;
-
-            while (node.next != null) {
-                node = node.next;
-                newHash = hash(node.key);
-                newIndex = indexFor(newHash, newLength);
-
-                putNode(newIndex, node, newTable);
-            }
-        }
-
-        limit = (int) (newLength * loadFactor);
-    }
-
-    private void putNode(int index, Node<K, V> node, Node<K, V>[] table) {
-        if (table[index] == null) {
-            table[index] = node;
-        } else {
-            Node<K, V> thisNode = table[index];
-
-            while (thisNode.next != null) {
-                thisNode = thisNode.next;
-            }
-            thisNode.next = node;
-        }
-    }
-
     public V delete(Object key) {
         Node<K, V> node = getNode(key);
 
@@ -108,7 +72,7 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
             } else if (parentNode != null){
                 parentNode.next = null;
             } else {
-                int index = indexFor(node.key.hashCode(), table.length);
+                int index = indexFor(node.hash, table.length);
 
                 table[index] = null;
             }
@@ -138,11 +102,11 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
 
     private Node<K, V> getNode(Object key) {
         int keyHash = hash(key);
-        if (table != null) {
-            for (int i = 0; i < size; i++) {
-                if (table[i].hash == keyHash && table[i].key.equals(key)) {
+        if (table != null && size != 0) {
+            for (int i = 0; i < table.length; i++) {
+                if (table[i] != null && table[i].hash == keyHash && table[i].key.equals(key)) {
                     return table[i];
-                } else if (table[i].next != null) {
+                } else if (table[i] != null && table[i].next != null) {
                     Node<K, V> node = table[i];
 
                     while (node.next != null) {
@@ -160,10 +124,10 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     }
 
     private Node<K, V> getParentNode(Node<K, V> node) {
-        for (int i = 0; i < size; i++) {
-            if (table[i].next == node) {
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null && table[i].next == node) {
                 return table[i];
-            } else if (table[i].next != null) {
+            } else if (table[i] != null && table[i].next != null) {
                 Node<K, V> thisNode = table[i];
 
                 while (thisNode.next != null) {
@@ -190,6 +154,44 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
 
     private int indexFor(int hash, int tableLength) {
         return hash & (tableLength - 1);
+    }
+
+    private void resize() {
+        int newLength = size << 1;
+        Node<K, V>[] newTable = new Node[newLength];
+
+        newTable[0] = table[0];
+        for (int i = 1; i < table.length; i++) {
+            if (table[i] != null) {
+                Node<K, V> node = table[i];
+                int newHash = hash(node.key);
+                int newIndex = indexFor(newHash, newLength);
+                newTable[newIndex] = node;
+
+                while (node.next != null) {
+                    node = node.next;
+                    newHash = hash(node.key);
+                    newIndex = indexFor(newHash, newLength);
+
+                    putNode(newIndex, node, newTable);
+                }
+            }
+        }
+
+        limit = (int) (newLength * loadFactor);
+    }
+
+    private void putNode(int index, Node<K, V> node, Node<K, V>[] table) {
+        if (table[index] == null) {
+            table[index] = node;
+        } else {
+            Node<K, V> thisNode = table[index];
+
+            while (thisNode.next != null) {
+                thisNode = thisNode.next;
+            }
+            thisNode.next = node;
+        }
     }
 
     private static class Node<K, V> implements Map.Entry<K, V> {

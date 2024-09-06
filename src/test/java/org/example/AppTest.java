@@ -1,38 +1,59 @@
 package org.example;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+public class AppTest {
+    MyHashMap<String, String> myHashMap;
+
+    @BeforeEach
+    public void setupMyHashMap() {
+        System.out.println("@BeforeAll executed");
+        myHashMap = new MyHashMap<>();
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    @Test
+    public void testAddElementsWithSimilarKey() {
+        System.out.println("==TEST ONE EXECUTED==");
+
+        myHashMap.put("1", "One");
+        Assertions.assertEquals("One", myHashMap.put("1", "Two"));
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    @Test
+    public void testAddElementsWithSimilarHash() {
+        System.out.println("==TEST TWO EXECUTED==");
+
+        myHashMap.put("A", "One");
+        Assertions.assertNull(myHashMap.put("BB", "Two"));
+    }
+
+    @Test
+    public void testAddManyElements() {
+        System.out.println("==TEST THREE EXECUTED==");
+
+        for (int i = 0; i < 10; i++) {
+            myHashMap.put(String.valueOf(i), "element " + i);
+        }
+    }
+
+    @Test
+    public void testDeleteManyElements() {
+        System.out.println("==TEST FOUR EXECUTED==");
+
+        for (int i = 0; i < 10; i++) {
+            myHashMap.put(String.valueOf(i), "element " + String.valueOf(i));
+        }
+        for (int i = 0; i < 10; i++) {
+            Assertions.assertNotEquals(null, myHashMap.delete(String.valueOf(i)));
+        }
+    }
+
+    @AfterEach
+    public void tearHashMap() {
+        System.out.println("@AfterEach executed");
+        myHashMap = null;
     }
 }
