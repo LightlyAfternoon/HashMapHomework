@@ -34,7 +34,7 @@ public class AppTest {
     public void testAddManyElements() {
         System.out.println("==TEST THREE EXECUTED==");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 200; i++) {
             myHashMap.put(String.valueOf(i), "element " + i);
         }
     }
@@ -43,11 +43,12 @@ public class AppTest {
     public void testDeleteManyElements() {
         System.out.println("==TEST FOUR EXECUTED==");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 200; i++) {
             myHashMap.put(String.valueOf(i), "element " + String.valueOf(i));
         }
-        for (int i = 0; i < 10; i++) {
-            Assertions.assertNotEquals(null, myHashMap.delete(String.valueOf(i)));
+        for (int i = 0; i < 200; i++) {
+            // TODO ПЕРЕПРОВЕРИТЬ!
+            Assertions.assertNotEquals(null, String.valueOf(myHashMap.delete(String.valueOf(i))));
         }
     }
 
