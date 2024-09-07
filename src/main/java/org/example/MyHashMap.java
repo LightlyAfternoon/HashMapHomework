@@ -2,6 +2,17 @@ package org.example;
 
 import java.util.*;
 
+/**
+ * {@code MyHashMap} is an {@code AbstractMap} implementation.
+ *  Its structure consists from hash table - a key-value Node and Index of bucket,
+ *  where node is storing.
+ *  Node is a nested class implements a {@code Map.Entry} interface and contains
+ *  fields hash for calculating an index, key, value, and next - a field for
+ *  storing Nodes that were put in this bucket previously.
+ *
+ * @param <K> the type of keys
+ * @param <V> the type of values
+ */
 public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private final static int DEFAULT_TABLE_CAPACITY = 16;
     private final static float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -9,10 +20,14 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private Node<K, V>[] table;
     private int size = 0;
     private int limit;
+    /**
+     * loadFactor is an indicator of at what load MyHashMap should recreate
+     * an array with increased capacity and transfer all Nodes.
+     */
     private final float loadFactor;
 
     public MyHashMap(int capacity, float loadFactor) {
-        int MAX_CAPACITY = Integer.MAX_VALUE / 2;
+        int MAX_CAPACITY = Integer.MAX_VALUE >> 1;
         this.loadFactor = loadFactor;
 
         if (loadFactor <= 0 || Float.isNaN(loadFactor)) {
@@ -38,11 +53,21 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         this(DEFAULT_TABLE_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
+    /**
+     * Returns the number of key-value Nodes int this map
+     * @return the number of key-value Nodes int this map
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * Returns the value connected with the key, or null
+     * if this map contains no mapping for this key
+     * @return Returns the value connected with the key, or null
+     * if this map contains no mapping for the key
+     */
     @Override
     public V get(Object key) {
         Node<K, V> node = getNode(key);
@@ -53,6 +78,16 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
+    /**
+     * Returns the previous value associated with the key in this map,
+     * or null if there was no mapping for this key.
+     * This method adds a new Node in this map, or override a value for
+     * existing Node with the key.
+     * If a bucket already has a Node, then this Node placed in a field {@code next}
+     * of new Node, and new Node places in this bucket
+     * @return Returns the previous value associated with the key in this map,
+     * or null if there was no mapping for this key
+     */
     @Override
     public V put(K key, V value) {
         Node<K, V> existedNode = getNode(key);
@@ -81,6 +116,15 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
+    /**
+     * Returns the value that was associated with the key in this map,
+     * or null if there was no mapping for this key.
+     * This method delete Node in this map with the key, if this Node exists.
+     * If this Node have another Node in its {@code next} field, than Node
+     * will replace deleting Node in a bucket or in a {@code next} field of parent Node.
+     * @return Returns the value that was associated with the key in this map,
+     *      * or null if there was no mapping for this key
+     */
     public V delete(Object key) {
         Node<K, V> node = getNode(key);
 
@@ -109,6 +153,12 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
+    /**
+     * Returns a collection of all values that containing in this map,
+     * or empty collection.
+     * @return Returns a collection of all values that containing in this map,
+     *      * or empty collection
+     */
     @Override
     public Collection<V> values() {
         Collection<V> collection = new ArrayList<>();
@@ -129,6 +179,12 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         return collection;
     }
 
+    /**
+     * Returns a Set of all keys that containing in this map,
+     * or empty Set.
+     * @return Returns a Set of all keys that containing in this map,
+     *      * or empty Set
+     */
     @Override
     public Set<K> keySet() {
         Set<K> set = new HashSet<>();
@@ -149,6 +205,12 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         return set;
     }
 
+    /**
+     * Returns a Set of all key-value Entries that containing in this map,
+     * or empty Set.
+     * @return Returns a Set of all key-value Entries that containing in this map,
+     *      * or empty Set
+     */
     @Override
     public Set<Entry<K, V>> entrySet() {
         Set<Entry<K, V>> set = new HashSet<>();
@@ -229,12 +291,11 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         for (int i = 0; i < table.length; i++) {
             if (table[i] != null) {
                 Node<K, V> node = table[i];
-                int newHash;
                 int newIndex;
+
                 do {
                     Node<K, V> next = node.next;
-                    newHash = hash(node.key);
-                    newIndex = indexFor(newHash, newLength);
+                    newIndex = indexFor(node.hash, newLength);
 
                     node.next = newTable[newIndex];
                     newTable[newIndex] = node;

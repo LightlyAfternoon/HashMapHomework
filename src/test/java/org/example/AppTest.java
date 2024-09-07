@@ -91,6 +91,8 @@ public class AppTest {
             myHashMap.put(null, "element " + i);
         }
         Assertions.assertEquals("element 19", myHashMap.get(null));
+        myHashMap.put(null, null);
+        Assertions.assertNull(myHashMap.get(null));
         Assertions.assertEquals(1, myHashMap.size());
     }
 
