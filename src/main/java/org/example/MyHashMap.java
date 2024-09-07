@@ -9,12 +9,33 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private Node<K, V>[] table;
     private int size = 0;
     private int limit;
-    private float loadFactor;
+    private final float loadFactor;
+
+    public MyHashMap(int capacity, float loadFactor) {
+        int MAX_CAPACITY = Integer.MAX_VALUE / 2;
+        this.loadFactor = loadFactor;
+
+        if (loadFactor <= 0 || Float.isNaN(loadFactor)) {
+            throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
+        }
+        if (capacity > MAX_CAPACITY) {
+            table = new Node[MAX_CAPACITY];
+            limit = (int) (MAX_CAPACITY * loadFactor);
+        } else if (capacity < 1) {
+            table = new Node[DEFAULT_TABLE_CAPACITY];
+            limit = (int) (DEFAULT_TABLE_CAPACITY * loadFactor);
+        } else {
+            table = new Node[capacity];
+            limit = (int) (capacity * loadFactor);
+        }
+    }
+
+    public MyHashMap(int capacity) {
+        this(capacity, DEFAULT_LOAD_FACTOR);
+    }
 
     public MyHashMap() {
-        table = new Node[DEFAULT_TABLE_CAPACITY];
-        loadFactor = DEFAULT_LOAD_FACTOR;
-        limit = (int) (DEFAULT_TABLE_CAPACITY * loadFactor);
+        this(DEFAULT_TABLE_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -227,13 +248,10 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
     }
 
     private void putNode(int index, Node<K, V> node, Node<K, V>[] table) {
-        if (table[index] == null) {
-            table[index] = node;
-        } else {
-            Node<K, V> thisNode = table[index];
-            node.next = thisNode;
-            table[index] = node;
+        if (table[index] != null) {
+            node.next = table[index];
         }
+        table[index] = node;
     }
 
     private static class Node<K, V> implements Map.Entry<K, V> {
