@@ -165,6 +165,34 @@ public class AppTest {
         }
     }
 
+    @Test
+    public void testConstructors() {
+        System.out.println("==TEST ELEVEN EXECUTED==");
+        myHashMap = new MyHashMap<>(55, 0.4f);
+
+        for (int i = 0; i < 100; i++) {
+            myHashMap.put(String.valueOf(i), "element " + i);
+        }
+
+        List<String> list = (List<String>) myHashMap.values();
+
+        for (int i = 0; i < 100; i++) {
+            Assertions.assertTrue(list.contains("element " + i));
+        }
+
+        myHashMap = new MyHashMap<>(9);
+
+        for (int i = 0; i < 100; i++) {
+            myHashMap.put(String.valueOf(i), "element " + i);
+        }
+
+        list = (List<String>) myHashMap.values();
+
+        for (int i = 0; i < 100; i++) {
+            Assertions.assertTrue(list.contains("element " + i));
+        }
+    }
+
     @AfterEach
     public void tearHashMap() {
         System.out.println("@AfterEach executed");
