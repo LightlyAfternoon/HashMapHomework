@@ -1,7 +1,6 @@
 package org.example;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MyHashMap<K, V> extends AbstractMap<K, V> {
     private final static int DEFAULT_TABLE_CAPACITY = 16;
@@ -71,6 +70,10 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
                 parentNode.next = node.next;
             } else if (parentNode != null){
                 parentNode.next = null;
+            } else if (node.next != null) {
+                int index = indexFor(node.hash, table.length);
+
+                table[index] = node.next;
             } else {
                 int index = indexFor(node.hash, table.length);
 
@@ -87,30 +90,75 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public Collection<V> values() {
-        return Arrays.stream(table).map(t -> t.value).collect(Collectors.toList());
+        Collection<V> collection = new ArrayList<>();
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                collection.add(table[i].value);
+
+                Node<K, V> next = table[i].next;
+                if (next != null) {
+                    do {
+                        collection.add(next.value);
+                        next = next.next;
+                    } while (next != null);
+                }
+            }
+        }
+
+        return collection;
     }
 
     @Override
     public Set<K> keySet() {
-        return Arrays.stream(table).map(t -> t.key).collect(Collectors.toSet());
+        Set<K> set = new HashSet<>();
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                set.add(table[i].key);
+
+                Node<K, V> next = table[i].next;
+                if (next != null) {
+                    do {
+                        set.add(next.key);
+                        next = next.next;
+                    } while (next != null);
+                }
+            }
+        }
+
+        return set;
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return Arrays.stream(table).collect(Collectors.toSet());
+        Set<Entry<K, V>> set = new HashSet<>();
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                set.add(table[i]);
+
+                Node<K, V> next = table[i].next;
+                if (next != null) {
+                    do {
+                        set.add(next);
+                        next = next.next;
+                    } while (next != null);
+                }
+            }
+        }
+
+        return set;
     }
 
     private Node<K, V> getNode(Object key) {
         int keyHash = hash(key);
         if (size != 0) {
             int i = indexFor(keyHash, table.length);
-            if (table[i] != null && table[i].hash == keyHash && table[i].key.equals(key)) {
+            if (table[i] != null && table[i].hash == keyHash && (table[i].key == key || table[i].key.equals(key))) {
                 return table[i];
             } else if (table[i] != null && table[i].next != null) {
                 Node<K, V> node = table[i].next;
 
                 do {
-                    if (node.hash == keyHash && node.key.equals(key)) {
+                    if (node.hash == keyHash && (node.key == key || node.key.equals(key))) {
                         return node;
                     }
                 } while ((node = node.next) != null);
@@ -157,8 +205,7 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> {
         int newLength = size << 1;
         Node<K, V>[] newTable = new Node[newLength];
 
-        newTable[0] = table[0];
-        for (int i = 1; i < table.length; i++) {
+        for (int i = 0; i < table.length; i++) {
             if (table[i] != null) {
                 Node<K, V> node = table[i];
                 int newHash;
