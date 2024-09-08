@@ -34,7 +34,6 @@ class MyHashMapTest {
         myHashMap.put("Aa", "One");
         Assertions.assertNull(myHashMap.put("BB", "Two"));
         Assertions.assertEquals(2, myHashMap.size());
-
     }
 
     @Test
