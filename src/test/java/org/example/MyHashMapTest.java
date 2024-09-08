@@ -9,17 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AppTest {
+class MyHashMapTest {
     MyHashMap<String, String> myHashMap;
 
     @BeforeEach
-    public void setupMyHashMap() {
+    void setupMyHashMap() {
         System.out.println("@BeforeAll executed");
         myHashMap = new MyHashMap<>();
     }
 
     @Test
-    public void testAddElementsWithSimilarKey() {
+    void testAddElementsWithSimilarKey() {
         System.out.println("==TEST ONE EXECUTED==");
 
         myHashMap.put("1", "One");
@@ -28,7 +28,7 @@ public class AppTest {
     }
 
     @Test
-    public void testAddElementsWithSimilarHash() {
+    void testAddElementsWithSimilarHash() {
         System.out.println("==TEST TWO EXECUTED==");
 
         myHashMap.put("Aa", "One");
@@ -38,7 +38,7 @@ public class AppTest {
     }
 
     @Test
-    public void testAddManyElements() {
+    void testAddManyElements() {
         System.out.println("==TEST THREE EXECUTED==");
 
         for (int i = 0; i < 10000; i++) {
@@ -48,7 +48,7 @@ public class AppTest {
     }
 
     @Test
-    public void testGetManyElements() {
+    void testGetManyElements() {
         System.out.println("==TEST FOUR EXECUTED==");
 
         for (int i = 0; i < 1001; i++) {
@@ -63,7 +63,7 @@ public class AppTest {
     }
 
     @Test
-    public void testDeleteManyElements() {
+    void testDeleteManyElements() {
         System.out.println("==TEST FIVE EXECUTED==");
 
         for (int i = 0; i < 1001; i++) {
@@ -84,7 +84,7 @@ public class AppTest {
     }
 
     @Test
-    public void testAddAndGetNullKeyElements() {
+    void testAddAndGetNullKeyElements() {
         System.out.println("==TEST SIX EXECUTED==");
 
         for (int i = 0; i < 20; i++) {
@@ -97,7 +97,7 @@ public class AppTest {
     }
 
     @Test
-    public void testGetAllValues() {
+    void testGetAllValues() {
         System.out.println("==TEST SEVEN EXECUTED==");
 
         for (int i = 0; i < 1000; i++) {
@@ -112,7 +112,7 @@ public class AppTest {
     }
 
     @Test
-    public void testGetKeySet() {
+    void testGetKeySet() {
         System.out.println("==TEST EIGHT EXECUTED==");
 
         for (int i = 0; i < 1000; i++) {
@@ -127,7 +127,7 @@ public class AppTest {
     }
 
     @Test
-    public void testGetEntrySet() {
+    void testGetEntrySet() {
         System.out.println("==TEST NINE EXECUTED==");
 
         for (int i = 0; i < 1000; i++) {
@@ -145,7 +145,7 @@ public class AppTest {
     }
 
     @Test
-    public void testChangeValues() {
+    void testChangeValues() {
         System.out.println("==TEST TEN EXECUTED==");
 
         for (int i = 0; i < 1000; i++) {
@@ -166,7 +166,7 @@ public class AppTest {
     }
 
     @Test
-    public void testConstructors() {
+    void testConstructors() {
         System.out.println("==TEST ELEVEN EXECUTED==");
         myHashMap = new MyHashMap<>(55, 0.4f);
 
@@ -194,7 +194,7 @@ public class AppTest {
     }
 
     @AfterEach
-    public void tearHashMap() {
+    void tearHashMap() {
         System.out.println("@AfterEach executed");
         myHashMap = null;
     }
